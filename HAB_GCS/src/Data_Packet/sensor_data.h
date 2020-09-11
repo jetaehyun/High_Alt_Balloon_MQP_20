@@ -5,15 +5,20 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#include "dataPack.h"
+
+#define SENSOR_PAYLOAD
+#define RELEASE_PAYLOAD
+
 // will send 30 bytes
 struct HAB_payload_t {
     // 0
     uint8_t payload_type;
     // 1
     uint8_t *payload;
-    // 2
+    // 25
     uint8_t checksum;
-    // 3
+    // 26
 };
 
 struct sensor_data_t {
@@ -34,22 +39,17 @@ struct sensor_data_t {
 
 struct release_data_t {
     // 0
-    uint8_t payload_type;
-    // 1
     uint8_t confirmation;
-    // 2
+    // 1
 };
 
-enum payload_type {
-    sensor_payload = 0,
-    release_payload = 1
-};
+bool HAB_unpack(uint8_t* payload, struct HAB_payload_t *data);
 
-void unpack_payload(uint8_t* payload);
-void sensor_payload_pack(struct sensor_data_t *payload);
-void release_data_pack(struct release_data_t *payload);
-bool checkPayload();
-int calculate_checksum();
-bool confirm_checksum();
+void HAB_payload_pack(uint8_t* payload, void *data);
+uint8_t sensor_payload_pack(uint8_t *payload, struct sensor_data_t *data);
+uint8_t release_data_pack(uint8_t *payload, struct release_data_t *data);
+
+uint8_t calculate_checksum();
+bool confirm_checksum(uint8_t* payload);
 
 #endif
