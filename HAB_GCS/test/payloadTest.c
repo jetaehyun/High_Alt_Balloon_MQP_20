@@ -1,7 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include "../src/Data_Packet/sensor_data.h"
+
+#include "../src/Data_Packet/header/sensor_payload.h"
+#include "../src/Data_Packet/header/data_packet.h"
+#include "../src/Data_Packet/header/release_payload.h"
+
+// gcc -Wall ../src/Data_Packet/sensor_payload.c ../src/Data_Packet/data_packet.c ../src/Data_Packet/release_payload.c ../src/Data_Packet/byte_manipulation.c payloadTest.c -o test.exe
 
 bool testReleasePack() {
     struct release_data_t *data = create_release_payload(PAYLOAD_RELEASE);
