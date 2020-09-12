@@ -1,5 +1,16 @@
 #include "header/sensor_payload.h"
 
+/**
+ * @brief Create a sensor payload object
+ * 
+ * @param baro_sensor 
+ * @param NO2_sensor 
+ * @param temp_sensor 
+ * @param UV_sensor 
+ * @param CO2_sensor 
+ * @param Ozone_sensor 
+ * @return struct sensor_data_t* 
+ */
 struct sensor_data_t *create_sensor_payload(int32_t baro_sensor, int32_t NO2_sensor, int32_t temp_sensor, int32_t UV_sensor, int32_t CO2_sensor, int32_t Ozone_sensor) {
     struct sensor_data_t *data = malloc(sizeof(struct sensor_data_t));
 
@@ -13,6 +24,12 @@ struct sensor_data_t *create_sensor_payload(int32_t baro_sensor, int32_t NO2_sen
     return data;
 }
 
+/**
+ * @brief function to unpack sensor data
+ *  
+ * @param payload data to unpack
+ * @return struct sensor_data_t returns the data in sensor struct
+ */
 struct sensor_data_t sensor_payload_unpack(uint8_t* payload) {
     struct sensor_data_t data;
 
@@ -26,6 +43,13 @@ struct sensor_data_t sensor_payload_unpack(uint8_t* payload) {
     return data;
 }
 
+/**
+ * @brief function to pack data into bytes
+ * 
+ * @param payload array of bytes to store data into
+ * @param data data to be stored
+ * @return uint8_t number of written bytes
+ */
 uint8_t sensor_payload_pack(uint8_t *payload, struct sensor_data_t *data) {
 
     pack_32(payload, data->baro_sensor);
