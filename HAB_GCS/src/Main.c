@@ -1,10 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sqlite3.h>
+#include <sys/types.h>
+#include <fcntl.h>
 
 #include "Data_Packet/header/data_packet.h"
 #include "Data_Packet/header/release_payload.h"
 #include "Data_Packet/header/sensor_payload.h"
+#include "SQLDatabase/database.h"
 
 int main(int argc, const char** argv) {
 
@@ -14,7 +18,7 @@ int main(int argc, const char** argv) {
     }
 
     uint8_t buffer[26];
-    struct HAB_Payload_t *payload = malloc(sizeof(struct HAB_Payload_t));
+    struct HAB_payload_t payload;
 
     // find correct port
     int descriptor = open(argv[1], O_RDONLY | O_NOCTTY);
@@ -29,15 +33,15 @@ int main(int argc, const char** argv) {
         if(size > 1) {
 
             // check payload and update payload
-            if(!HAB_payload_unpack(buffer, payload)) continue;
+            if(!HAB_payload_unpack(buffer, &payload)) continue;
 
             // unpack sensor/release payload
-            if(payload->payload_type == SENSOR_PAYLOAD) {
-                struct sensor_data_t sensor_payload = sensor_payload_unpack(payload->payload);
+            if(payload.payload_type == SENSOR_PAYLOAD) {
+                struct sensor_data_t sensor_payload = sensor_payload_unpack(payload.payload);
                 // function to graph
             }
-            else if(payload->payload_type == RELEASE_PAYLOAD) {
-                struct release_data_t release_payload = release_payload_unpack(payload->payload);
+            else if(payload.payload_type == RELEASE_PAYLOAD) {
+                struct release_data_t release_payload = release_payload_unpack(payload.payload);
                 // confirmation 1
             }
 
@@ -47,9 +51,7 @@ int main(int argc, const char** argv) {
         sleep(5); // sleep 5s
     }
 
-    // free memory
-    free(payload);
-    free(sensor_payload);
+    close(descriptor);
 
     return 0;
 }

@@ -3,7 +3,7 @@ build_dir = .build
 
 CC = gcc
 CFLAGS = -g -Wall
-# INC_FLAGS
+INC_FLAGS = -lsqlite3
 
 SOURCES = \
 	main.c\
@@ -11,13 +11,14 @@ SOURCES = \
 	sensor_payload.c\
 	release_payload.c\
 	data_packet.c\
+	database.c\
 
 OBJECTS = $(addprefix $(build_dir)/,$(SOURCES:.c=.o)) 
 
 TARGET = gcs.exe
 
 $(TARGET) : $(OBJECTS)
-	$(CC) $(CFLAGS) $(OBJECTS) -o $@
+	$(CC) $(CFLAGS) $(OBJECTS) $(INC_FLAGS) -o $@
 
 
 $(build_dir)/%.o: %.c | $(build_dir)
@@ -31,5 +32,5 @@ $(build_dir):
 clean:
 	rm -f $(TARGET) $(OBJECTS)
 
-VPATH = src Data_Packet
+VPATH = src Data_Packet SQLDatabase
 
