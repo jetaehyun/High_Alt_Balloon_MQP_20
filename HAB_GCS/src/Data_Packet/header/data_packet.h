@@ -16,7 +16,7 @@ struct HAB_payload_t {
     // 0
     uint8_t payload_type;
     // 1
-    uint8_t payload[24]; // max 24 bytes
+    uint8_t payload[28]; // max 28 bytes
     // 2
     uint8_t checksum;
     // 3

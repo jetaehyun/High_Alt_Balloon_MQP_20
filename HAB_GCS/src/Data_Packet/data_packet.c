@@ -5,7 +5,7 @@ struct HAB_payload_t *HAB_payload_create(uint8_t payload_type, uint8_t *payload)
 
     data->payload_type = payload_type;
 
-    for(int i = 0; i < 24; i++) {
+    for(int i = 0; i < 28; i++) {
         data->payload[i] = payload[i];
     }
 
@@ -17,28 +17,28 @@ struct HAB_payload_t *HAB_payload_create(uint8_t payload_type, uint8_t *payload)
 
 bool HAB_payload_unpack(uint8_t* payload, struct HAB_payload_t *data) {
 
-    if(!confirm_checksum(payload, 26)) return false;
+    if(!confirm_checksum(payload, 30)) return false;
 
     data->payload_type = unpack_8(payload);
 
-    for(int i = 0; i < 24; i++) {
+    for(int i = 0; i < 28; i++) {
         data->payload[i] = payload[1 + i];
     }
 
-    data->checksum = payload[25];
+    data->checksum = payload[29];
 
     return true;
 }
 
 uint8_t HAB_payload_pack(uint8_t *payload, struct HAB_payload_t *data) {
     pack_8(payload, data->payload_type);
-    for(int i = 0; i < 24; i++) {
+    for(int i = 0; i < 28; i++) {
         pack_8(payload + i + 1, data->payload[i]);
     }
 
-    uint8_t checksum = calculate_checksum(payload, 25);
+    uint8_t checksum = calculate_checksum(payload, 28);
 
-    pack_8(payload + 25, checksum);
+    pack_8(payload + 29, checksum);
 
     return 26;
 }

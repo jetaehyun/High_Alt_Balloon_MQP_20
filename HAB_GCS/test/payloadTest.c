@@ -13,7 +13,7 @@ bool testReleasePack() {
 
     struct release_data_t *data = create_release_payload(PAYLOAD_RELEASE);
 
-    uint8_t *payload = malloc(24);
+    uint8_t *payload = malloc(28);
 
     release_payload_pack(payload, data);
     struct release_data_t data2 = release_payload_unpack(payload);
@@ -30,21 +30,22 @@ bool testSensorPack() {
     bool success = true;
 
     struct sensor_data_t *data = create_sensor_payload(
-        123456, 123456, 123456, 123456, 123456, 123456
+        123456, 123456, 123456, 123456, 123456, 123456, 123456
     );
 
 
-    uint8_t *payload = malloc(24);
+    uint8_t *payload = malloc(28);
 
     sensor_payload_pack(payload, data); // pack into bytes
     struct sensor_data_t data2 = sensor_payload_unpack(payload);
 
-    if(data2.baro_sensor != 123456  ||
+    if(data2.pressure_sensor != 123456  ||
         data2.NO2_sensor != 123456  ||
         data2.temp_sensor != 123456 || 
         data2.UV_sensor != 123456   ||
         data2.CO2_sensor != 123456  ||
-        data2.Ozone_sensor != 123456) {
+        data2.Ozone_sensor != 123456 ||
+        data2.altitude != 123456) {
             success = false;
     }
 
@@ -76,15 +77,15 @@ bool testHABPack() {
     bool success = true;
 
     struct sensor_data_t *data = create_sensor_payload(
-        123456, 123456, 123456, 123456, 123456, 123456
+        123456, 123456, 123456, 123456, 123456, 123456, 123456
     );
 
 
-    uint8_t *payload = malloc(24);
+    uint8_t *payload = malloc(28);
 
     sensor_payload_pack(payload, data); // pack into bytes
     
-    uint8_t *mainPayload = malloc(26);
+    uint8_t *mainPayload = malloc(30);
     struct HAB_payload_t *HAB_data = HAB_payload_create(RELEASE_PAYLOAD, payload);
     struct HAB_payload_t *HAB_data2 = malloc(sizeof(struct HAB_payload_t));
     HAB_payload_pack(mainPayload, HAB_data);
@@ -94,12 +95,13 @@ bool testHABPack() {
     if(HAB_data2->payload_type != RELEASE_PAYLOAD) success = false;
 
     struct sensor_data_t sensorData = sensor_payload_unpack(HAB_data2->payload);
-    if(sensorData.baro_sensor != 123456  ||
+    if(sensorData.pressure_sensor != 123456  ||
         sensorData.NO2_sensor != 123456  ||
         sensorData.temp_sensor != 123456 || 
         sensorData.UV_sensor != 123456   ||
         sensorData.CO2_sensor != 123456  ||
-        sensorData.Ozone_sensor != 123456) {
+        sensorData.Ozone_sensor != 123456 ||
+        sensorData.altitude != 123456) {
             success = false;
     }
 
