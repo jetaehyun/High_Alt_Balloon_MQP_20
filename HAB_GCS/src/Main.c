@@ -10,7 +10,7 @@
 #include "Data_Packet/header/sensor_payload.h"
 #include "SQLDatabase/database.h"
 
-int main(int argc, const char** argv) {
+int main(int argc, const char* argv[]) {
 
     // if(argc < 1) {
     //     printf("Enter serial port... Ex: /dev/ttyS4\n");
