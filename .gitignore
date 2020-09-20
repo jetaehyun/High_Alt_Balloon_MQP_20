@@ -2,3 +2,4 @@
 *.exe
 HAB_GCS/src/.build/**
 *.db
+.vscode

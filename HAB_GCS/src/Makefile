@@ -6,7 +6,7 @@ CFLAGS = -g -Wall
 INC_FLAGS = -lsqlite3
 
 SOURCES = \
-	main.c\
+	Main.c\
 	byte_manipulation.c\
 	sensor_payload.c\
 	release_payload.c\
