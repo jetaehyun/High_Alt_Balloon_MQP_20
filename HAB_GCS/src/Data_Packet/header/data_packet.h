@@ -11,7 +11,7 @@
 #define SENSOR_PAYLOAD 1 
 #define RELEASE_PAYLOAD 2
 
-// will send 26 bytes
+// will send 30 bytes
 struct HAB_payload_t {
     // 0
     uint8_t payload_type;

@@ -12,7 +12,7 @@ bool startDB();
 bool checkTable();
 bool dropTable();
 bool dropDB();
-bool insertDatabase(int id, float baro_sensor, float NO2_sensor, float temp_sensor, float UV_sensor, float CO2_sensor, float Ozone_sensor);
+bool insertDatabase(int id, float pressure_sensor, float NO2_sensor, float temp_sensor, float UV_sensor, float CO2_sensor, float Ozone_sensor, float altitude);
 bool closeDB();
 bool createDir();
 

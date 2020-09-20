@@ -3,12 +3,13 @@
 sqlite3 *db;
 const char *table = "CREATE TABLE Sensor ("
                     "ID INT PRIMARY KEY NOT NULL, "
-                    "baro_sensor REAL, "
+                    "pressure_sensor REAL, "
                     "NO2_sensor REAL, "
                     "temp_sensor REAL, "
                     "UV_sensor REAL, "
                     "CO2_sensor REAL, "
-                    "Ozone_sensor REAL);";
+                    "Ozone_sensor REAL, "
+                    "Altitude Real);";
 
 /**
  * @brief starts database
@@ -76,10 +77,10 @@ bool closeDB() {
  * @return true inserted successfully
  * @return false failed to insert
  */
-bool insertDatabase(int id, float baro_sensor, float NO2_sensor, float temp_sensor, float UV_sensor, float CO2_sensor, float Ozone_sensor) {
+bool insertDatabase(int id, float pressure_sensor, float NO2_sensor, float temp_sensor, float UV_sensor, float CO2_sensor, float Ozone_sensor, float altitude) {    
     char insert[100] = {'\n'};
     
-    sprintf(insert, "INSERT INTO Sensor VALUES(%d, %f, %f, %f, %f, %f, %f);", id, baro_sensor, NO2_sensor, temp_sensor, UV_sensor, CO2_sensor, Ozone_sensor);
+    sprintf(insert, "INSERT INTO Sensor VALUES(%d, %f, %f, %f, %f, %f, %f, %f);", id, pressure_sensor, NO2_sensor, temp_sensor, UV_sensor, CO2_sensor, Ozone_sensor, altitude);
 
     char *data;
     int rc = sqlite3_exec(db, insert, callback, (void*)data, NULL);

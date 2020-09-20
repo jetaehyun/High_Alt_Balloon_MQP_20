@@ -8,7 +8,7 @@
 #include "Data_Packet/header/data_packet.h"
 #include "Data_Packet/header/release_payload.h"
 #include "Data_Packet/header/sensor_payload.h"
-#include "SQLDatabase/database.h"
+#include "Database/database.h"
 
 int main(int argc, const char* argv[]) {
 
