@@ -1,6 +1,11 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <unistd.h> 
+#include <string.h> 
+#include <sys/types.h> 
+#include <sys/socket.h> 
+#include <arpa/inet.h> 
+#include <netinet/in.h> 
 #include <sqlite3.h>
 #include <sys/types.h>
 #include <fcntl.h>
@@ -10,7 +15,45 @@
 #include "Data_Packet/header/sensor_payload.h"
 #include "Database/database.h"
 
+#define PORT 8808
+#define SIZE 30
+
 int main(int argc, const char* argv[]) {
+
+    int sockfd;
+    char buffer[SIZE] = {'\0'}; 
+    struct sockaddr_in servaddr; 
+    socklen_t len = sizeof(servaddr);
+
+    // Creating socket file descriptor 
+    if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
+        perror("socket creation failed"); 
+        exit(EXIT_FAILURE); 
+    } 
+  
+    memset(&servaddr, '\0', sizeof(servaddr)); 
+      
+    // Filling server information 
+    servaddr.sin_family = AF_INET; 
+    servaddr.sin_port = htons(PORT); 
+    servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+    while(1) {
+
+        int size = recvfrom(sockfd, buffer, SIZE, 0, (struct sockaddr *) &servaddr, &len);
+        
+        printf("HE\n");
+        if(size > 0) {
+
+            printf("%s\n", buffer);
+        }
+
+
+        sleep(1);
+    }  
+      
+  
+    close(sockfd); 
 
     // if(argc < 1) {
     //     printf("Enter serial port... Ex: /dev/ttyS4\n");

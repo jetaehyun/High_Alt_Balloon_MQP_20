@@ -1,5 +1,7 @@
 .DS_Store
 *.exe
 HAB_GCS/src/.build/**
+HAB_Payload/src/.build/**
 *.db
 .vscode
+*.code-workspace
