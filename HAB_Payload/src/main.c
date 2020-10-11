@@ -19,7 +19,7 @@ int main(int argc, const char *argv[]) {
   
     // clear servaddr 
     bzero(&servaddr, sizeof(servaddr)); 
-    servaddr.sin_addr.s_addr = inet_addr("127.0.0.1"); 
+    servaddr.sin_addr.s_addr = htonl(INADDR_ANY); 
     servaddr.sin_port = htons(PORT); 
     servaddr.sin_family = AF_INET; 
       

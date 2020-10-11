@@ -15,34 +15,56 @@
 #include "Data_Packet/header/sensor_payload.h"
 #include "Database/database.h"
 
-#define PORT 8808
+#define PORT 1160
 #define SIZE 30
 
+//server
 int main(int argc, const char* argv[]) {
-    char buffer[100]; 
+
+    char buffer[SIZE] = {'\0'}; 
     char *message = "Hello Client"; 
     int listenfd, len; 
     struct sockaddr_in servaddr, cliaddr; 
-    bzero(&servaddr, sizeof(servaddr)); 
   
     // Create a UDP Socket 
-    listenfd = socket(AF_INET, SOCK_DGRAM, 0);         
+    if((listenfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+        perror("Couldn't create socket\n");
+        return 0;
+    }
+
+    memset((char *)&servaddr, 0, sizeof(servaddr));
+
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY); 
+    // servaddr.sin_addr.s_addr = inet_addr("192.168.0.188"); 
     servaddr.sin_port = htons(PORT); 
-    servaddr.sin_family = AF_INET;  
+    servaddr.sin_family = AF_INET; 
+
+    // cliaddr.sin_addr.s_addr = inet_addr("192.168.0.156"); 
+    // cliaddr.sin_port = htons(PORT); 
+    // cliaddr.sin_family = AF_INET; 
+ 
    
     // bind server address to socket descriptor 
-    bind(listenfd, (struct sockaddr*)&servaddr, sizeof(servaddr)); 
+    if(bind(listenfd, (struct sockaddr*)&servaddr, sizeof(servaddr)) < 0) {
+        perror("Failed to bind socket");
+        exit(EXIT_FAILURE);
+    } 
        
 
     while(1) {
-
-        if(recvfrom(listenfd, buffer, sizeof(buffer), 0, (struct sockaddr*)NULL, NULL) > 0) {
-            puts(buffer);   
+    
+        int some = recvfrom(listenfd, buffer, SIZE, 0, (struct sockaddr*)&cliaddr, sizeof(cliaddr));
+        if(some > 0) {
+            buffer[some] = '\0';
+            printf("%d\n", some);
         }
+        // puts(some);   
+        
 
         sleep(2);      
     }  
+
+    close(listenfd);
 
 
     // if(argc < 1) {
