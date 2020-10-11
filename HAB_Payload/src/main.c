@@ -7,32 +7,43 @@
 #include <arpa/inet.h> 
 #include <netinet/in.h>
 #include <netdb.h>
+
 // #include <wiringPi.h>
 
 #define PORT 1160
-#define SIZE 30
+#define MAXLINE 1024 
 
 int main(int argc, const char *argv[]) {
-    char buffer[SIZE]; 
-    int sockfd, n;
-    struct sockaddr_in servaddr; 
-    char *message = "Hello Client"; 
+int sockfd; 
+    char buffer[MAXLINE]; 
+    char *hello = "Hello from client"; 
+    struct sockaddr_in     servaddr; 
   
-      // create datagram socket 
-    sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-    
-    memset((char*)&servaddr, 0, sizeof(servaddr));
-    servaddr.sin_family = AF_INET;
-    servaddr.sin_port = htons(PORT);
-    // servaddr.sin_port = inet_addr("192.168.0.188"); 
-    servaddr.sin_port = INADDR_ANY; 
-
+    // Creating socket file descriptor 
+    if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
+        perror("socket creation failed"); 
+        exit(EXIT_FAILURE); 
+    } 
+  
+    memset(&servaddr, 0, sizeof(servaddr)); 
+      
+    // Filling server information 
+    servaddr.sin_family = AF_INET; 
+    servaddr.sin_port = htons(PORT); 
+    servaddr.sin_addr.s_addr = inet_addr("192.168.0.156"); 
+      
+    int n, len; 
+      
     while(1) {
-        sendto(sockfd, message, strlen(message), 0, 
-          (struct sockaddr*)&servaddr, sizeof(servaddr)); 
-        sleep(2);
-    }
+        sendto(sockfd, (const char *)hello, strlen(hello), 
+            0x800, (const struct sockaddr *) &servaddr,  
+                sizeof(servaddr)); 
+        printf("Hello message sent.\n"); 
 
+        sleep(2);
+    }  
+
+  
     close(sockfd); 
 
            
