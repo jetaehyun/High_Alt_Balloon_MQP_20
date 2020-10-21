@@ -13,17 +13,15 @@
 #include "Data_Packet/header/data_packet.h"
 #include "Data_Packet/header/release_payload.h"
 #include "Data_Packet/header/sensor_payload.h"
-#include "Database/database.h"
+// #include "Database/database.h"
 
 #define PORT 1160
-#define MAXLINE 1024 
+#define SIZE 30
 
 //server
 int main(int argc, const char* argv[]) {
 
     int sockfd; 
-    char buffer[MAXLINE]; 
-    char *hello = "Hello from server"; 
     struct sockaddr_in servaddr, cliaddr; 
       
     // Creating socket file descriptor 
@@ -37,7 +35,7 @@ int main(int argc, const char* argv[]) {
       
     // Filling server information 
     servaddr.sin_family    = AF_INET; // IPv4 
-    servaddr.sin_addr.s_addr = inet_addr("192.168.0.156"); 
+    servaddr.sin_addr.s_addr = inet_addr("192.168.1.99"); 
     servaddr.sin_port = htons(PORT); 
       
     // Bind the socket with the server address 
@@ -55,13 +53,26 @@ int main(int argc, const char* argv[]) {
     int len, n; 
   
     len = sizeof(cliaddr);  //len is value/resuslt 
-  
+    
+    struct HAB_payload_t *HAB_data2 = malloc(sizeof(struct HAB_payload_t));
+    uint8_t *mainPayload = malloc(30);
+    HAB_payload_unpack(mainPayload, HAB_data2); 
+
     while(1) {
-        n = recvfrom(sockfd, (char *)buffer, MAXLINE,  
-                    MSG_WAITALL, ( struct sockaddr *) &cliaddr, 
-                    &len); 
-        buffer[n] = '\0'; 
-        printf("buffer: %s\n", buffer);
+        n = recvfrom(sockfd, mainPayload, SIZE, MSG_WAITALL, (struct sockaddr *) &cliaddr, &len);
+        HAB_payload_unpack(mainPayload, HAB_data2);
+        struct sensor_data_t sensorData = sensor_payload_unpack(HAB_data2->payload);
+
+        printf("buffer: %d, %d, %d, %d, %d, %d, %d\n"
+        , 
+        sensorData.altitude,
+        sensorData.CO2_sensor,
+        sensorData.NO2_sensor,
+        sensorData.Ozone_sensor,
+        sensorData.pressure_sensor,
+        sensorData.temp_sensor,
+        sensorData.UV_sensor);
+
         sleep(2);
     }
 
