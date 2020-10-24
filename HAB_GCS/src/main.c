@@ -13,7 +13,8 @@
 #include "Data_Packet/header/data_packet.h"
 #include "Data_Packet/header/release_payload.h"
 #include "Data_Packet/header/sensor_payload.h"
-// #include "Database/database.h"
+#include "postData.h"
+#include "Database/database.h"
 
 #define PORT 1160
 #define SIZE 30
@@ -21,149 +22,65 @@
 //server
 int main(int argc, const char* argv[]) {
 
-    int sockfd; 
-    struct sockaddr_in servaddr, cliaddr; 
-      
-    // Creating socket file descriptor 
-    if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
-        perror("socket creation failed"); 
-        exit(EXIT_FAILURE); 
-    } 
-      
-    memset(&servaddr, 0, sizeof(servaddr)); 
-    memset(&cliaddr, 0, sizeof(cliaddr)); 
-      
-    // Filling server information 
-    servaddr.sin_family    = AF_INET; // IPv4 
-    servaddr.sin_addr.s_addr = inet_addr("192.168.1.99"); 
-    servaddr.sin_port = htons(PORT); 
-      
-    // Bind the socket with the server address 
-    if ( bind(sockfd, (const struct sockaddr *)&servaddr,  
-            sizeof(servaddr)) < 0 ) 
-    { 
-        perror("bind failed"); 
-        exit(EXIT_FAILURE); 
-    }
-
-    cliaddr.sin_family    = AF_INET; // IPv4 
-    cliaddr.sin_addr.s_addr = INADDR_ANY; 
-    cliaddr.sin_port = htons(PORT);  
-      
-    int len, n; 
-  
-    len = sizeof(cliaddr);  //len is value/resuslt 
+    // connectWithServer();    
+    // sendData(1.2,1.2,1.2,1.2,1.2,1.2,1.2);
+    // closeConnection();
     
-    struct HAB_payload_t *HAB_data2 = malloc(sizeof(struct HAB_payload_t));
-    uint8_t *mainPayload = malloc(30);
-    HAB_payload_unpack(mainPayload, HAB_data2); 
 
-    while(1) {
-        n = recvfrom(sockfd, mainPayload, SIZE, MSG_WAITALL, (struct sockaddr *) &cliaddr, &len);
-        HAB_payload_unpack(mainPayload, HAB_data2);
-        struct sensor_data_t sensorData = sensor_payload_unpack(HAB_data2->payload);
-
-        printf("buffer: %d, %d, %d, %d, %d, %d, %d\n"
-        , 
-        sensorData.altitude,
-        sensorData.CO2_sensor,
-        sensorData.NO2_sensor,
-        sensorData.Ozone_sensor,
-        sensorData.pressure_sensor,
-        sensorData.temp_sensor,
-        sensorData.UV_sensor);
-
-        sleep(2);
-    }
-
-
-
-    // char buffer[SIZE] = {'\0'}; 
-    // char *message = "Hello Client"; 
-    // int listenfd, len; 
+    // int sockfd; 
     // struct sockaddr_in servaddr, cliaddr; 
-  
-    // // Create a UDP Socket 
-    // if((listenfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-    //     perror("Couldn't create socket\n");
-    //     return 0;
-    // }
-
-    // memset((char *)&servaddr, 0, sizeof(servaddr));
-
-    // servaddr.sin_addr.s_addr = htonl(INADDR_ANY); 
-    // // servaddr.sin_addr.s_addr = inet_addr("192.168.0.188"); 
-    // servaddr.sin_port = htons(PORT); 
-    // servaddr.sin_family = AF_INET; 
-
-    // // cliaddr.sin_addr.s_addr = inet_addr("192.168.0.188"); 
-    // // cliaddr.sin_port = htons(PORT); 
-    // // cliaddr.sin_family = AF_INET; 
- 
-   
-    // // bind server address to socket descriptor 
-    // if(bind(listenfd, (struct sockaddr*)&servaddr, sizeof(servaddr)) < 0) {
-    //     perror("Failed to bind socket");
-    //     exit(EXIT_FAILURE);
+      
+    // // Creating socket file descriptor 
+    // if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
+    //     perror("socket creation failed"); 
+    //     exit(EXIT_FAILURE); 
     // } 
-       
+      
+    // memset(&servaddr, 0, sizeof(servaddr)); 
+    // memset(&cliaddr, 0, sizeof(cliaddr)); 
+      
+    // // Filling server information 
+    // servaddr.sin_family    = AF_INET; // IPv4 
+    // servaddr.sin_addr.s_addr = inet_addr("192.168.1.99"); 
+    // servaddr.sin_port = htons(PORT); 
+      
+    // // Bind the socket with the server address 
+    // if ( bind(sockfd, (const struct sockaddr *)&servaddr,  
+    //         sizeof(servaddr)) < 0 ) 
+    // { 
+    //     perror("bind failed"); 
+    //     exit(EXIT_FAILURE); 
+    // }
 
-    // while(1) {
+    // cliaddr.sin_family    = AF_INET; // IPv4 
+    // cliaddr.sin_addr.s_addr = INADDR_ANY; 
+    // cliaddr.sin_port = htons(PORT);  
+      
+    // int len, n; 
+  
+    // len = sizeof(cliaddr);  //len is value/resuslt 
     
-    //     int some = recvfrom(listenfd, buffer, SIZE, 0, (struct sockaddr*)&cliaddr, sizeof(cliaddr));
-    //     if(some > 0) {
-    //         buffer[some] = '\0';
-    //         printf("%d\n", some);
-    //     }
-    //     // puts(some);   
-        
-
-    //     sleep(2);      
-    // }  
-
-    // close(listenfd);
-
-
-    // if(argc < 1) {
-    //     printf("Enter serial port... Ex: /dev/ttyS4\n");
-    //     return 0;
-    // }
-
-    // uint8_t buffer[30];
-    // struct HAB_payload_t payload;
-
-    // // find correct port
-    // int descriptor = open(argv[1], O_RDONLY | O_NOCTTY);
-
-    // if(descriptor == -1) {
-    //     perror("Unable to open port...\n");
-    // }
+    // struct HAB_payload_t *HAB_data2 = malloc(sizeof(struct HAB_payload_t));
+    // uint8_t *mainPayload = malloc(30);
+    // HAB_payload_unpack(mainPayload, HAB_data2); 
 
     // while(1) {
+    //     n = recvfrom(sockfd, mainPayload, SIZE, MSG_WAITALL, (struct sockaddr *) &cliaddr, &len);
+    //     HAB_payload_unpack(mainPayload, HAB_data2);
+    //     struct sensor_data_t sensorData = sensor_payload_unpack(HAB_data2->payload);
 
-    //     int size = read(descriptor, buffer, 26);
-    //     if(size > 1) {
+    //     printf("buffer: %d, %d, %d, %d, %d, %d, %d\n"
+    //     , 
+    //     sensorData.altitude,
+    //     sensorData.CO2_sensor,
+    //     sensorData.NO2_sensor,
+    //     sensorData.Ozone_sensor,
+    //     sensorData.pressure_sensor,
+    //     sensorData.temp_sensor,
+    //     sensorData.UV_sensor);
 
-    //         // check payload and update payload
-    //         if(!HAB_payload_unpack(buffer, &payload)) continue;
-
-    //         // unpack sensor/release payload
-    //         if(payload.payload_type == SENSOR_PAYLOAD) {
-    //             struct sensor_data_t sensor_payload = sensor_payload_unpack(payload.payload);
-    //             // function to graph
-    //         }
-    //         else if(payload.payload_type == RELEASE_PAYLOAD) {
-    //             struct release_data_t release_payload = release_payload_unpack(payload.payload);
-    //             // confirmation 1
-    //         }
-
-
-    //     }
-
-    //     sleep(5); // sleep 5s
+    //     sleep(2);
     // }
-
-    // close(descriptor);
 
     return 0;
 }
