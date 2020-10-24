@@ -10,10 +10,10 @@
 #include <sys/types.h>
 #include <fcntl.h>
 
-#include "Data_Packet/header/data_packet.h"
-#include "Data_Packet/header/release_payload.h"
-#include "Data_Packet/header/sensor_payload.h"
-#include "postData.h"
+#include "header/data_packet.h"
+#include "header/release_payload.h"
+#include "header/sensor_payload.h"
+#include "header/postData.h"
 #include "Database/database.h"
 
 #define PORT 1160
@@ -58,7 +58,7 @@ int main(int argc, const char* argv[]) {
       
     // int len, n; 
   
-    // len = sizeof(cliaddr);  //len is value/resuslt 
+    // len = sizeof(cliaddr); 
     
     // struct HAB_payload_t *HAB_data2 = malloc(sizeof(struct HAB_payload_t));
     // uint8_t *mainPayload = malloc(30);

@@ -33,5 +33,5 @@ $(build_dir):
 clean:
 	rm -f $(TARGET) $(OBJECTS)
 
-VPATH = src Data_Packet Database
+VPATH = src header Database
 
