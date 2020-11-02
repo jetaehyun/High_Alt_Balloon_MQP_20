@@ -48,6 +48,8 @@ V10 Mike Grusin, SparkFun Electronics 10/24/2013
 
 #include <SFE_BMP180.h>
 #include <Wire.h>
+#include <data_packet.h>
+#include <sensor_payload.h>
 
 int const UV_SENSOR_PIN = A0;
 int const NO2_SENSOR_PIN = A1;
@@ -67,6 +69,13 @@ void setup()
   Serial.begin(9600);
   Serial.println("REBOOT");
 
+
+    struct sensor_data_t *test = create_sensor_payload(12,12,12,12,12,12,12);
+    Serial.print(test->NO2_sensor);
+    Serial.println();
+
+  
+
   // Initialize the sensor (it is important to get calibration values stored on the device).
 
   if (pressure.begin())
@@ -83,6 +92,7 @@ void setup()
 
 void loop()
 {
+
   char status;
   double T,P,p0,a;
 
