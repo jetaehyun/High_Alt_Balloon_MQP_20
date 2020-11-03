@@ -68,17 +68,18 @@ bool closeDB() {
  * @brief inserts data into db
  * 
  * @param id 
- * @param baro_sensor 
+ * @param pressure_sensor 
  * @param NO2_sensor 
  * @param temp_sensor 
  * @param UV_sensor 
  * @param CO2_sensor 
  * @param Ozone_sensor 
+ * @param altitude
  * @return true inserted successfully
  * @return false failed to insert
  */
 bool insertDatabase(int id, float pressure_sensor, float NO2_sensor, float temp_sensor, float UV_sensor, float CO2_sensor, float Ozone_sensor, float altitude) {    
-    char insert[100] = {'\n'};
+    char insert[1024] = {'\n'};
     
     sprintf(insert, "INSERT INTO Sensor VALUES(%d, %f, %f, %f, %f, %f, %f, %f);", id, pressure_sensor, NO2_sensor, temp_sensor, UV_sensor, CO2_sensor, Ozone_sensor, altitude);
 
