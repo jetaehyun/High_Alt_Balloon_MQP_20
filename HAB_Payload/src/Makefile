@@ -11,7 +11,7 @@ SOURCES = \
 	sensor_payload.c\
 	release_payload.c\
 	data_packet.c\
-	# database.c\
+	database.c\
 
 OBJECTS = $(addprefix $(build_dir)/,$(SOURCES:.c=.o)) 
 
@@ -32,5 +32,5 @@ $(build_dir):
 clean:
 	rm -f $(TARGET) $(OBJECTS)
 
-VPATH = src Data_Packet SQLDatabase
+VPATH = src Data_Packet Database
 

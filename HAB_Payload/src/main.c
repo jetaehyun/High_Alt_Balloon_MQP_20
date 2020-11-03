@@ -8,10 +8,10 @@
 #include <netinet/in.h>
 #include <netdb.h>
 
-#include "Data_Packet/header/data_packet.h"
-#include "Data_Packet/header/release_payload.h"
-#include "Data_Packet/header/sensor_payload.h"
-// #include "Database/database.h"
+#include "Data_Packet/data_packet.h"
+#include "Data_Packet/release_payload.h"
+#include "Data_Packet/sensor_payload.h"
+#include "Database/database.h"
 
 // #include <wiringPi.h>
 

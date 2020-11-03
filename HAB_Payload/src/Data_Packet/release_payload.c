@@ -1,4 +1,4 @@
-#include "header/release_payload.h"
+#include "release_payload.h"
 
 /**
  * @brief Create a release payload object
