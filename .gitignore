@@ -1,7 +1,7 @@
 .DS_Store
-*.exe
-HAB_GCS/src/.build/**
-HAB_Payload/src/.build/**
-*.db
+**.exe
+**.build/
+**.vscode/
+**.db
 .vscode
-*.code-workspace
+**.code-workspace
