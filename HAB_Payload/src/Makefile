@@ -7,10 +7,10 @@ INC_FLAGS = -lsqlite3
 
 SOURCES = \
 	main.c\
-	# byte_manipulation.c\
-	# sensor_payload.c\
-	# release_payload.c\
-	# data_packet.c\
+	byte_manipulation.c\
+	sensor_payload.c\
+	release_payload.c\
+	data_packet.c\
 	# database.c\
 
 OBJECTS = $(addprefix $(build_dir)/,$(SOURCES:.c=.o)) 
