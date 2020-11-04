@@ -1,8 +1,9 @@
 #include "database.h"
 
 sqlite3 *db;
+int primary_key_id = 0;
 const char *table = "CREATE TABLE Sensor ("
-                    "ID INT PRIMARY KEY NOT NULL, "
+                    "sensorID INT PRIMARY KEY NOT NULL, "
                     "pressure_sensor REAL, "
                     "NO2_sensor REAL, "
                     "temp_sensor REAL, "
@@ -10,6 +11,80 @@ const char *table = "CREATE TABLE Sensor ("
                     "CO2_sensor REAL, "
                     "Ozone_sensor REAL, "
                     "Altitude Real);";
+
+/**
+ * @brief print SQL error message and free
+ * 
+ * @param msg error message to print
+ */
+void printErr(char *msg)  {
+    fprintf(stderr, "SQL Error: %s\n", msg);
+    sqlite3_free(msg);
+}
+
+/**
+ * @brief callback function for SQL query
+ * 
+ * @param data 
+ * @param argc 
+ * @param argv 
+ * @param azColName 
+ * @return int 
+ */
+int callback(void* data, int argc, char** argv, char** azColName) { 
+    int i; 
+    fprintf(stderr, "%s: ", (const char*)data); 
+  
+    for (i = 0; i < argc; i++) { 
+        printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL"); 
+    } 
+  
+    printf("\n"); 
+    return 0; 
+} 
+
+/**
+ * @brief set current primary key id 
+ * 
+ * @param data 
+ * @param argc 
+ * @param argv 
+ * @param azColName 
+ * @return int 
+ */
+int setIDCallback(void* data, int argc, char** argv, char** azColName) {
+    int currPrimeKey = atoi(argv[0]); 
+    
+    if(argc == 0) {
+
+        primary_key_id = 0;
+    } else {
+
+        primary_key_id = currPrimeKey + 1;
+    }
+
+    return 0; 
+}
+
+/**
+ * @brief query the last known id and set it via callback
+ * 
+ */
+void setID() {
+    
+    const char *query = "SELECT sensorID FROM Sensor ORDER BY sensorID DESC LIMIT 1;";
+    
+    char *err = 0;
+    int rc = 0;
+
+    rc = sqlite3_exec(db, query, setIDCallback, 0, &err);
+    
+    if(rc != SQLITE_OK) {
+        printErr(err);
+
+    }
+
+}
 
 /**
  * @brief starts database
@@ -20,24 +95,24 @@ const char *table = "CREATE TABLE Sensor ("
 bool startDB() {
     printf("----------------------------------------------------------------------------\n\n");
     
-    createDir();
+    createDir(); 
 
-    if(sqlite3_open("DataLog/sensor_data.db", &db) == 1) {
-        return false;
-    }
-
+    sqlite3_open("DataLog/sensor_data.db", &db);
+   
     char *err = 0;
     int ok = sqlite3_exec(db, table, callback, 0, &err);
 
     if(ok != SQLITE_OK) {
-        fprintf(stderr, "SQL Error: %s\n\n", err);
-        sqlite3_free(err);
+        printErr(err);
+
     }
     else {
-        printf("Sensor table created...\n\n");
+        printf("Sensor table created...");
     }
 
-    printf("----------------------------------------------------------------------------\n\n");
+    setID();
+
+    printf("\n\n----------------------------------------------------------------------------\n\n");
 
     return true;
 }
@@ -67,27 +142,27 @@ bool closeDB() {
 /**
  * @brief inserts data into db
  * 
- * @param id 
- * @param baro_sensor 
+ * @param pressure_sensor 
  * @param NO2_sensor 
  * @param temp_sensor 
  * @param UV_sensor 
  * @param CO2_sensor 
  * @param Ozone_sensor 
+ * @param altitude
  * @return true inserted successfully
  * @return false failed to insert
  */
-bool insertDatabase(int id, float pressure_sensor, float NO2_sensor, float temp_sensor, float UV_sensor, float CO2_sensor, float Ozone_sensor, float altitude) {    
-    char insert[100] = {'\n'};
+bool insertDatabase(float pressure_sensor, float NO2_sensor, float temp_sensor, float UV_sensor, float CO2_sensor, float Ozone_sensor, float altitude) {    
+    char insert[1024] = {'\n'};
     
-    sprintf(insert, "INSERT INTO Sensor VALUES(%d, %f, %f, %f, %f, %f, %f, %f);", id, pressure_sensor, NO2_sensor, temp_sensor, UV_sensor, CO2_sensor, Ozone_sensor, altitude);
+    sprintf(insert, "INSERT INTO Sensor VALUES(%d, %f, %f, %f, %f, %f, %f, %f);", primary_key_id, pressure_sensor, NO2_sensor, temp_sensor, UV_sensor, CO2_sensor, Ozone_sensor, altitude);
+    primary_key_id++;
 
-    char *data;
-    int rc = sqlite3_exec(db, insert, callback, (void*)data, NULL);
     char *err = 0;
+    int rc = sqlite3_exec(db, insert, callback, 0, &err);
 
     if(rc != SQLITE_OK) {
-        printf("Sensor data could not be inserted...\n");
+        printErr(err);
         return false;
     }
 
@@ -105,15 +180,13 @@ bool insertDatabase(int id, float pressure_sensor, float NO2_sensor, float temp_
 bool checkTable() {
     const char *select = "SELECT * FROM Sensor;";
 
-    char *data;
-    int rc = sqlite3_exec(db, select, callback, (void*)data, NULL);
+    char *err = 0;
+    int rc = sqlite3_exec(db, select, callback, 0, &err);
 
     if(rc != SQLITE_OK) {
-        printf("Sensor Table does not exist...\n");
+        printErr(err);
         return false;
     }
-
-    printf("Sensor Table exists...\n");
 
     return true;
 
@@ -128,11 +201,11 @@ bool checkTable() {
 bool dropTable() {
     const char *drop = "DROP TABLE Sensor;";
 
-    char *data;
-    int rc = sqlite3_exec(db, drop, callback, (void*)data, NULL);
+    char *err = 0;
+    int rc = sqlite3_exec(db, drop, callback, 0, &err);
 
     if(rc != SQLITE_OK) {
-        printf("Sensor table failed to drop...\n");
+        printErr(err);        
         return false;
     }
 
@@ -170,7 +243,7 @@ bool createDir() {
     int ok = mkdir("DataLog", 0777);
 
     if(ok == -1) {
-        printf("DataLog directory was not made...\n");
+        printf("DataLog directory already exists...\n");
         return false;
     }
 
