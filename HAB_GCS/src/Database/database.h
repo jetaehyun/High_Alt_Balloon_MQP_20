@@ -12,21 +12,10 @@ bool startDB();
 bool checkTable();
 bool dropTable();
 bool dropDB();
-bool insertDatabase(int id, float pressure_sensor, float NO2_sensor, float temp_sensor, float UV_sensor, float CO2_sensor, float Ozone_sensor, float altitude);
+void setID();
+void printErr(char *msg);
+bool insertDatabase(float pressure_sensor, float NO2_sensor, float temp_sensor, float UV_sensor, float CO2_sensor, float Ozone_sensor, float altitude);
 bool closeDB();
 bool createDir();
-
-static int callback(void* data, int argc, char** argv, char** azColName) 
-{ 
-    int i; 
-    fprintf(stderr, "%s: ", (const char*)data); 
-  
-    for (i = 0; i < argc; i++) { 
-        printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL"); 
-    } 
-  
-    printf("\n"); 
-    return 0; 
-} 
 
 #endif

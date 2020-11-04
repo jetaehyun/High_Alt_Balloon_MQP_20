@@ -44,7 +44,7 @@ void sendData(float pressure_sensor, float NO2_sensor, float temp_sensor, float 
     sprintf(buffer, request, API_KEY, pressure_sensor, NO2_sensor, temp_sensor, UV_sensor, CO2_sensor, Ozone_sensor, altitude);
 
     bytes = write(sockfd, buffer, sizeof(buffer));
-    // printf("Number of bytes: %d\n", bytes);
+    printf("(ThingSpeak)Number of bytes: %d\n", bytes);
     // puts(buffer);
 
     // read(sockfd, buffer2, sizeof(buffer2));
