@@ -3,7 +3,7 @@ build_dir = .build
 
 CC = gcc
 CFLAGS = -g -Wall
-INC_FLAGS = -lsqlite3
+INC_FLAGS = -lsqlite3 -lwiringPi
 
 SOURCES = \
 	main.c\
