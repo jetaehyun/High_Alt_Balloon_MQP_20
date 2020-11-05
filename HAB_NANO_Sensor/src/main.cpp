@@ -69,10 +69,21 @@ void setup()
   Serial.begin(9600);
   Serial.println("REBOOT");
 
+    // TEST CODE TO SEND DATA VIA TX
+    /*
+    uint8_t SENSOR_DATA_PAYLOAD[28];
+    uint8_t SENSOR_DATA_TX[30];
 
-    struct sensor_data_t *test = create_sensor_payload(12,12,12,12,12,12,12);
-    Serial.print(test->NO2_sensor);
-    Serial.println();
+
+    struct sensor_data_t *test = create_sensor_payload(32,2,2,2,2,2,2);
+    sensor_payload_pack(SENSOR_DATA_PAYLOAD, test);
+    struct HAB_payload_t *test2 = HAB_payload_create(SENSOR_PAYLOAD, SENSOR_DATA_PAYLOAD);
+    HAB_payload_pack(SENSOR_DATA_TX, test2);
+
+    Serial.write(SENSOR_DATA_TX, 30);
+    delay(2000);
+
+    */
 
   
 
