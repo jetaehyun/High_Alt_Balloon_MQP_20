@@ -31,16 +31,15 @@ int main(int argc, const char* argv[]) {
 
     signal(SIGINT, sigint_handler);
 
-    // connectWithServer();    
-    // sendData(1.2,1.2,1.2,1.2,1.2,1.2,1.2);
-    // closeConnection();
+    // connectWithServer();
+    // startDB();    
     
 
     int sockfd; 
     struct sockaddr_in servaddr, cliaddr; 
       
     // Creating socket file descriptor 
-    if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
+    if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) { 
         perror("socket creation failed"); 
         exit(EXIT_FAILURE); 
     } 
@@ -60,19 +59,18 @@ int main(int argc, const char* argv[]) {
         exit(EXIT_FAILURE); 
     } 
       
-    socklen_t len; 
+    socklen_t len = sizeof(cliaddr); 
     int n; 
-  
-    len = sizeof(cliaddr); 
     
     struct HAB_payload_t *HAB_data = malloc(sizeof(struct HAB_payload_t));
-    uint8_t *mainPayload = malloc(30);
-    // HAB_payload_unpack(mainPayload, HAB_data); 
+    uint8_t *mainPayload = malloc(SIZE);
 
     while(gatherData) {
-        n = recvfrom(sockfd, mainPayload, SIZE, MSG_WAITALL, (struct sockaddr *) &cliaddr, &len);
+        n = recvfrom(sockfd, mainPayload, SIZE, MSG_WAITALL, (struct sockaddr *) &cliaddr, &len); // this is blocking
         HAB_payload_unpack(mainPayload, HAB_data);
         struct sensor_data_t sensorData = sensor_payload_unpack(HAB_data->payload);
+        // sendData(1.2,1.2,1.2,1.2,1.2,1.2,1.2);
+        // insertDatabase();
 
         printf("buffer: %d, %d, %d, %d, %d, %d, %d\n"
         , 
@@ -89,6 +87,9 @@ int main(int argc, const char* argv[]) {
 
     free(mainPayload);
     free(HAB_data);
+    // closeConnection();
+    // closeDB();
+
 
     return 0;
 }
