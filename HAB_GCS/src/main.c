@@ -9,6 +9,7 @@
 #include <sqlite3.h>
 #include <sys/types.h>
 #include <fcntl.h>
+#include <signal.h>
 
 #include "header/data_packet.h"
 #include "header/release_payload.h"
@@ -19,8 +20,16 @@
 #define PORT 8808
 #define SIZE 30
 
+static volatile bool gatherData = true;
+
+void sigint_handler(int signum) {
+    gatherData = false;
+}
+
 //server
 int main(int argc, const char* argv[]) {
+
+    signal(SIGINT, sigint_handler);
 
     // connectWithServer();    
     // sendData(1.2,1.2,1.2,1.2,1.2,1.2,1.2);
@@ -41,33 +50,29 @@ int main(int argc, const char* argv[]) {
       
     // Filling server information 
     servaddr.sin_family    = AF_INET; // IPv4 
-    servaddr.sin_addr.s_addr = inet_addr("192.168.1.99"); 
+    // servaddr.sin_addr.s_addr = inet_addr("192.168.1.99"); 
+    servaddr.sin_addr.s_addr = inet_addr("127.0.0.1"); 
     servaddr.sin_port = htons(PORT); 
       
     // Bind the socket with the server address 
-    if ( bind(sockfd, (const struct sockaddr *)&servaddr,  
-            sizeof(servaddr)) < 0 ) 
-    { 
+    if (bind(sockfd, (const struct sockaddr *)&servaddr, sizeof(servaddr)) < 0) { 
         perror("bind failed"); 
         exit(EXIT_FAILURE); 
-    }
-
-    // cliaddr.sin_family    = AF_INET; // IPv4 
-    // cliaddr.sin_addr.s_addr = INADDR_ANY; 
-    // cliaddr.sin_port = htons(PORT);  
+    } 
       
-    int len, n; 
+    socklen_t len; 
+    int n; 
   
     len = sizeof(cliaddr); 
     
-    struct HAB_payload_t *HAB_data2 = malloc(sizeof(struct HAB_payload_t));
+    struct HAB_payload_t *HAB_data = malloc(sizeof(struct HAB_payload_t));
     uint8_t *mainPayload = malloc(30);
-    HAB_payload_unpack(mainPayload, HAB_data2); 
+    // HAB_payload_unpack(mainPayload, HAB_data); 
 
-    while(1) {
+    while(gatherData) {
         n = recvfrom(sockfd, mainPayload, SIZE, MSG_WAITALL, (struct sockaddr *) &cliaddr, &len);
-        HAB_payload_unpack(mainPayload, HAB_data2);
-        struct sensor_data_t sensorData = sensor_payload_unpack(HAB_data2->payload);
+        HAB_payload_unpack(mainPayload, HAB_data);
+        struct sensor_data_t sensorData = sensor_payload_unpack(HAB_data->payload);
 
         printf("buffer: %d, %d, %d, %d, %d, %d, %d\n"
         , 
@@ -81,6 +86,9 @@ int main(int argc, const char* argv[]) {
 
         sleep(2);
     }
+
+    free(mainPayload);
+    free(HAB_data);
 
     return 0;
 }
