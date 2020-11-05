@@ -23,8 +23,8 @@ void startUDPServer(const char* ipaddr) {
 
 void closeServer() {
 
-    if(sockfd < 1) close(sockfd);
-    else           printf("UDP Server has not started...\n");
+    close(sockfd);
+    printf("UDP Server has not started...\n");
 
 }
 
