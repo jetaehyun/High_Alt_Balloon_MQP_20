@@ -30,11 +30,9 @@ void sigint_handler(int signum) {
 int main(int argc, const char* argv[]) {
 
     signal(SIGINT, sigint_handler);
-
-    // connectWithServer();
-    // startDB();    
     
-
+    startDB();    
+    
     int sockfd; 
     struct sockaddr_in servaddr, cliaddr; 
       
@@ -49,8 +47,8 @@ int main(int argc, const char* argv[]) {
       
     // Filling server information 
     servaddr.sin_family    = AF_INET; // IPv4 
-    // servaddr.sin_addr.s_addr = inet_addr("192.168.1.99"); 
-    servaddr.sin_addr.s_addr = inet_addr("127.0.0.1"); 
+    servaddr.sin_addr.s_addr = inet_addr("192.168.1.99"); 
+    // servaddr.sin_addr.s_addr = inet_addr("127.0.0.1"); 
     servaddr.sin_port = htons(PORT); 
       
     // Bind the socket with the server address 
@@ -69,26 +67,28 @@ int main(int argc, const char* argv[]) {
         n = recvfrom(sockfd, mainPayload, SIZE, MSG_WAITALL, (struct sockaddr *) &cliaddr, &len); // this is blocking
         HAB_payload_unpack(mainPayload, HAB_data);
         struct sensor_data_t sensorData = sensor_payload_unpack(HAB_data->payload);
-        // sendData(1.2,1.2,1.2,1.2,1.2,1.2,1.2);
+        float alt = (float)sensorData.altitude/1000;
+        float co2 = (float)sensorData.CO2_sensor/1000;
+        float no2 = (float)sensorData.NO2_sensor/1000;
+        float ozone = (float)sensorData.Ozone_sensor/1000;
+        float pres = (float)sensorData.pressure_sensor/1000;
+        float temp = (float)sensorData.temp_sensor/1000;
+        float uv = (float)sensorData.UV_sensor/1000;
+        printf("buffer: Alt: %f, CO2: %f, NO2: %f, Ozone:  %f, Pressure:  %f, Temp: %f, UV:  %f\n",alt, co2, no2, ozone, pres, temp, uv);
+
         // insertDatabase();
+        
+        connectWithServer();
+        sendData(pres, no2, temp, uv, co2, ozone, alt);
+        closeConnection();
 
-        printf("buffer: %d, %d, %d, %d, %d, %d, %d\n"
-        , 
-        sensorData.altitude,
-        sensorData.CO2_sensor,
-        sensorData.NO2_sensor,
-        sensorData.Ozone_sensor,
-        sensorData.pressure_sensor,
-        sensorData.temp_sensor,
-        sensorData.UV_sensor);
 
-        sleep(2);
+        sleep(5);
     }
 
     free(mainPayload);
     free(HAB_data);
-    // closeConnection();
-    // closeDB();
+    closeDB();
 
 
     return 0;
