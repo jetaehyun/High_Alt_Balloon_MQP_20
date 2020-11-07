@@ -1,7 +1,7 @@
 #include "header/postData.h"
 
 #define PORT 80
-#define API_KEY ""
+#define API_KEY "OIVOSQAHIWG8MIB4"
 
 struct hostent *server = NULL;
 struct sockaddr_in server_addr;
@@ -49,6 +49,9 @@ void sendData(float pressure_sensor, float NO2_sensor, float temp_sensor, float 
 
     // read(sockfd, buffer2, sizeof(buffer2));
     // puts(buffer2);
+
+    memset(buffer, '\0', 1024);
+    // memset(buffer2, '\0', 1024);
 
 }
 

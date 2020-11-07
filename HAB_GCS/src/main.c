@@ -76,7 +76,7 @@ int main(int argc, const char* argv[]) {
         float uv = (float)sensorData.UV_sensor/1000;
         printf("buffer: Alt: %f, CO2: %f, NO2: %f, Ozone:  %f, Pressure:  %f, Temp: %f, UV:  %f\n",alt, co2, no2, ozone, pres, temp, uv);
 
-        // insertDatabase();
+        insertDatabase(pres, no2, temp, uv, co2, ozone, alt);
         
         connectWithServer();
         sendData(pres, no2, temp, uv, co2, ozone, alt);
