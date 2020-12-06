@@ -73,8 +73,8 @@ int main(int argc, const char *argv[]) {
             
      while(gatherData) {
        int data = serialDataAvail(fd);
-       printf("data: %d\n", data);
-       if(data >= SIZE) {
+       //printf("data: %d\n", data);
+       if(data == SIZE) {
           for(int i = 0; i < SIZE; i++) {
             incoming_sensor_data[i] = (uint8_t)serialGetchar(fd);
 	        }
@@ -89,22 +89,23 @@ int main(int argc, const char *argv[]) {
 	        float pres = (float) w.pressure_sensor / 1000;
 	        float temp = (float) w.temp_sensor / 1000;
 	        float uv =  (float) w.UV_sensor / 1000;
-
-          printf("%f, %f, %f, %f, %f, %f, %f\n", alt, co2, no2, ozone, pres, temp, uv);
+          printf("PAYLOAD: alt: %f, co2: %f, no2: %f, ozone: %f, pressure: %f, temp: %f, uv: %f\n", alt, co2, no2, ozone, pres, temp, uv);
 
 	        insertDatabase(pres, no2, temp, uv, co2, ozone, alt);
 
 		
-       	  printf("%u\n",sendto(sockfd, incoming_sensor_data, SIZE, 
+       	  printf("bytes sent: %u\n\n",sendto(sockfd, incoming_sensor_data, SIZE, 
             MSG_CONFIRM, (const struct sockaddr *) &servaddr,  
             sizeof(servaddr))); 
-         	printf("Sensor data sent.\n"); 
 
 
-          serialFlush(fd);
 	      }
+      		while(serialDataAvail(fd)) {
+			serialGetchar(fd);
+		}	
+          serialFlush(fd);
 
-         sleep(5);
+         sleep(2);
      }  
 
   
