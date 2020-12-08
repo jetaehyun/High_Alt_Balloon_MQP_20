@@ -1,7 +1,7 @@
 #include "header/postData.h"
 
 #define PORT 80
-#define API_KEY "OIVOSQAHIWG8MIB4"
+#define API_KEY ""
 
 struct hostent *server = NULL;
 struct sockaddr_in server_addr;
