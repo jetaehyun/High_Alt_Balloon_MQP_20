@@ -65,16 +65,21 @@ int main(int argc, const char* argv[]) {
 
     while(gatherData) {
         n = recvfrom(sockfd, mainPayload, SIZE, MSG_WAITALL, (struct sockaddr *) &cliaddr, &len); // this is blocking
-        HAB_payload_unpack(mainPayload, HAB_data);
+        
+		  HAB_payload_unpack(mainPayload, HAB_data);
         struct sensor_data_t sensorData = sensor_payload_unpack(HAB_data->payload);
-        float alt = (float)sensorData.altitude/1000;
+        
+		  // obtain adjusted data
+		  float alt = (float)sensorData.altitude/1000;
         float co2 = (float)sensorData.CO2_sensor/1000;
         float no2 = (float)sensorData.NO2_sensor/1000;
         float ozone = (float)sensorData.Ozone_sensor/1000;
         float pres = (float)sensorData.pressure_sensor/1000;
         float temp = (float)sensorData.temp_sensor/1000;
         float uv = (float)sensorData.UV_sensor/1000;
-        printf("buffer: Alt: %f, CO2: %f, NO2: %f, Ozone:  %f, Pressure:  %f, Temp: %f, UV:  %f\n",alt, co2, no2, ozone, pres, temp, uv);
+
+        printf("buffer: Alt: %.2fft, CO2: %.2fppm, NO2: %.2fppb, Ozone:  %.2fppm, Pressure:  %.2finHg, Temp: %.2fCelsius, UV:  %.0f\n"
+				  ,alt, co2, no2, ozone, pres, temp, uv);
 
         insertDatabase(pres, no2, temp, uv, co2, ozone, alt);
         
