@@ -9,6 +9,7 @@
 #include <sqlite3.h>
 #include <sys/types.h>
 #include <fcntl.h>
+#include <signal.h>
 
 #include "header/data_packet.h"
 #include "header/release_payload.h"
@@ -16,22 +17,29 @@
 #include "header/postData.h"
 #include "Database/database.h"
 
+
+
 #define PORT 8808
 #define SIZE 30
+
+static volatile bool gatherData = true;
+
+void sigint_handler(int signum) {
+    gatherData = false;
+}
 
 //server
 int main(int argc, const char* argv[]) {
 
-    // connectWithServer();    
-    // sendData(1.2,1.2,1.2,1.2,1.2,1.2,1.2);
-    // closeConnection();
+    signal(SIGINT, sigint_handler);
     
-
+    startDB();    
+    
     int sockfd; 
     struct sockaddr_in servaddr, cliaddr; 
       
     // Creating socket file descriptor 
-    if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
+    if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) { 
         perror("socket creation failed"); 
         exit(EXIT_FAILURE); 
     } 
@@ -42,45 +50,53 @@ int main(int argc, const char* argv[]) {
     // Filling server information 
     servaddr.sin_family    = AF_INET; // IPv4 
     servaddr.sin_addr.s_addr = inet_addr("192.168.1.99"); 
+    // servaddr.sin_addr.s_addr = inet_addr("127.0.0.1"); 
     servaddr.sin_port = htons(PORT); 
       
     // Bind the socket with the server address 
-    if ( bind(sockfd, (const struct sockaddr *)&servaddr,  
-            sizeof(servaddr)) < 0 ) 
-    { 
+    if (bind(sockfd, (const struct sockaddr *)&servaddr, sizeof(servaddr)) < 0) { 
         perror("bind failed"); 
         exit(EXIT_FAILURE); 
-    }
-
-    // cliaddr.sin_family    = AF_INET; // IPv4 
-    // cliaddr.sin_addr.s_addr = INADDR_ANY; 
-    // cliaddr.sin_port = htons(PORT);  
+    } 
       
-    int len, n; 
-  
-    len = sizeof(cliaddr); 
+    socklen_t len = sizeof(cliaddr); 
+    int n; 
     
-    struct HAB_payload_t *HAB_data2 = malloc(sizeof(struct HAB_payload_t));
-    uint8_t *mainPayload = malloc(30);
-    HAB_payload_unpack(mainPayload, HAB_data2); 
+    struct HAB_payload_t *HAB_data = malloc(sizeof(struct HAB_payload_t));
+    uint8_t *mainPayload = malloc(SIZE);
 
-    while(1) {
-        n = recvfrom(sockfd, mainPayload, SIZE, MSG_WAITALL, (struct sockaddr *) &cliaddr, &len);
-        HAB_payload_unpack(mainPayload, HAB_data2);
-        struct sensor_data_t sensorData = sensor_payload_unpack(HAB_data2->payload);
+    while(gatherData) {
+        n = recvfrom(sockfd, mainPayload, SIZE, MSG_WAITALL, (struct sockaddr *) &cliaddr, &len); // this is blocking
+        
+		  HAB_payload_unpack(mainPayload, HAB_data);
+        struct sensor_data_t sensorData = sensor_payload_unpack(HAB_data->payload);
+        
+		  // obtain adjusted data
+		  float alt = (float)sensorData.altitude/1000;
+        float co2 = (float)sensorData.CO2_sensor/1000;
+        float no2 = (float)sensorData.NO2_sensor/1000;
+        float ozone = (float)sensorData.Ozone_sensor/1000;
+        float pres = (float)sensorData.pressure_sensor/1000;
+        float temp = (float)sensorData.temp_sensor/1000;
+        float uv = (float)sensorData.UV_sensor/1000;
 
-        printf("buffer: %d, %d, %d, %d, %d, %d, %d\n"
-        , 
-        sensorData.altitude,
-        sensorData.CO2_sensor,
-        sensorData.NO2_sensor,
-        sensorData.Ozone_sensor,
-        sensorData.pressure_sensor,
-        sensorData.temp_sensor,
-        sensorData.UV_sensor);
+        printf("buffer: Alt: %.2fft, CO2: %.2fppm, NO2: %.2fppb, Ozone:  %.2fppm, Pressure:  %.2finHg, Temp: %.2fCelsius, UV:  %.0f\n"
+				  ,alt, co2, no2, ozone, pres, temp, uv);
 
-        sleep(2);
+        insertDatabase(pres, no2, temp, uv, co2, ozone, alt);
+        
+        connectWithServer();
+        sendData(pres, no2, temp, uv, co2, ozone, alt);
+        closeConnection();
+
+
+        sleep(5);
     }
+
+    free(mainPayload);
+    free(HAB_data);
+    closeDB();
+
 
     return 0;
 }

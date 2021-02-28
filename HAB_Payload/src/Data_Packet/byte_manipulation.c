@@ -48,5 +48,7 @@ int32_t unpack_32(uint8_t* payload) {
 
     return data; 
 }
+// sudo vim /etc/rc.local
+// /home/thyunje/Documents/High_Alt_Balloon_MQP_20/HAB_Payload/src
 
 

@@ -47,7 +47,6 @@ V10 Mike Grusin, SparkFun Electronics 10/24/2013
 // (Wire is a standard library included with Arduino.):
 
 #include <SFE_BMP180.h>
-#include <MQ131.h>
 #include <Wire.h>
 #include <data_packet.h>
 #include <sensor_payload.h>
@@ -67,7 +66,6 @@ double baseline;
 double T, P, p0, a;
 int const UV_SENSOR_PIN = A3;
 int const NO2_SENSOR_PIN = A1;
-int const O3_SENSOR_PIN = A0;
 int const CO2_SENSOR_PIN = A2;
 
 
@@ -109,7 +107,6 @@ void setup()
     //Serial.println("BMP180 init fail\n\n");
     while(1); // Pause forever.
   }
-  MQ131.begin(2,O3_SENSOR_PIN, LOW_CONCENTRATION, 1000000);  
 
   //Serial.println("Calibration parameters");
   //Serial.print("R0 = ");
@@ -354,10 +351,10 @@ void loop()
   int UVReading = analogRead(UV_SENSOR_PIN) - ADC_OFFSET; // Get raw sensor reading for UV Sensor
   float UVVolts = UVReading * 4.6 / 1024.0; //Expected voltage output is between 0V and 1V
   float UV_index = convertUV (UVReading); //Sensor reads a UV index value between 1 and 10
-  //Serial.print ("Raw ADC data: ");
-  //Serial.print (UVReading);
-  //Serial.print ("  UV Index: ");
-  //Serial.println (UV_index);
+  Serial.print ("Raw ADC data: ");
+  Serial.print (UVReading);
+  Serial.print ("  UV Index: ");
+  Serial.println (UV_index);
   int32_t UV_payload = (int32_t)(UV_index * 1000); //Set the value to transmit to Raspberry Pi, increase by a factor of 1000 to maintain resolution
 
   
@@ -387,16 +384,6 @@ void loop()
     Serial.print(CO2_payload/ 1000); 
     Serial.println(" ppm");
   }  
-
-  int O3Reading = analogRead(O3_SENSOR_PIN); // Get raw sensor reading for O3 Sensor
-  Serial.print ("Raw ADC data: ");
-  Serial.println (O3Reading);
-  //MQ131.sample();
-  Serial.print("Concentration O3 : ");
-  //float O3_index = MQ131.getO3(PPM);
-  //Serial.print(O3_index);
-  //Serial.println(" ppm");
-  //int32_t O3_payload = O3_index * 1000;
 
 //Values for Pi: temperature_payload, pressure_payload, altitute_payload, UV_Payload, NO2_payload, CO2_payload, O3_payload
 
