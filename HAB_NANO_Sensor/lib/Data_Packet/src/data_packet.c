@@ -14,6 +14,10 @@ struct HAB_payload_t *HAB_payload_create(uint8_t payload_type, uint8_t *payload)
     return data;
 }
 
+void free_HAB_data(struct HAB_payload_t *payload) {
+    free(payload);
+}
+
 
 bool HAB_payload_unpack(uint8_t* payload, struct HAB_payload_t *data) {
 

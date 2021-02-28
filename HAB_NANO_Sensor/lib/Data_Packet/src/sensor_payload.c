@@ -25,6 +25,10 @@ struct sensor_data_t *create_sensor_payload(int32_t pressure_sensor, int32_t NO2
     return data;
 }
 
+void free_sensor_payload(struct sensor_data_t *payload) {
+    free(payload);
+}
+
 /**
  * @brief function to unpack sensor data
  *  
