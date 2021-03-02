@@ -75,7 +75,7 @@ The Payload is designed to read the incoming sensor data from the UNO and send i
 
 ## HAB_NANO_Sensor
 ### Description
-To collect sensor data, while keeping in mind of the physical dimensions of the payload, an Arduino UNO was selected. The UNO is tasked with reading the sensor data and packing them for transmission to the ***HAB_Payload***.
+To collect sensor data, while keeping in mind of the physical dimensions of the payload, an Arduino UNO was selected. The UNO is tasked with reading the sensor data and packing them for transmission to the ***HAB_Payload***. Note. make sure that there are no *Serial.println()* or any other functions that write to the data line except for the one that writes the sensor data. If you do not, you have have garbage data on the receiving end.
 
 ### How to upload program
 Open visual studio code and import the directory via **PlatformIO**. The .ini file should automaticaly be recognized and it should allow you to upload new code.
@@ -84,6 +84,7 @@ Open visual studio code and import the directory via **PlatformIO**. The .ini fi
 ### Ground Control Station
 * Any Linux machine
 * Ubiquiti dish
+* Ubiquity antenna
 ### Payload (Weather Balloon)
 * Raspberry Pi 4
 * 2x GoPro Hero7
