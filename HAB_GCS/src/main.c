@@ -72,7 +72,7 @@ int main(int argc, const char* argv[]) {
         struct sensor_data_t sensorData = sensor_payload_unpack(HAB_data->payload);
         
 		  // obtain adjusted data
-		  float alt = (float)sensorData.altitude/1000;
+		    float alt = (float)sensorData.altitude/1000;
         float co2 = (float)sensorData.CO2_sensor/1000;
         float no2 = (float)sensorData.NO2_sensor/1000;
         float ozone = (float)sensorData.Ozone_sensor/1000;
@@ -80,7 +80,7 @@ int main(int argc, const char* argv[]) {
         float temp = (float)sensorData.temp_sensor/1000;
         float uv = (float)sensorData.UV_sensor/1000;
 
-        printf("buffer: Alt: %.2fft, CO2: %.2fppm, NO2: %.2fppb, Ozone:  %.2fppm, Pressure:  %.2finHg, Temp: %.2fCelsius, UV:  %.0f\n"
+        printf("buffer: Alt: %.2fft, CO2: %.2fppm, NO2: %.2fppb, Ozone:  %.2fppb, Pressure:  %.2finHg, Temp: %.2fCelsius, UV:  %.0f\n"
 				  ,alt, co2, no2, ozone, pres, temp, uv);
 
         insertDatabase(pres, no2, temp, uv, co2, ozone, alt);
@@ -88,6 +88,8 @@ int main(int argc, const char* argv[]) {
         connectWithServer();
         sendData(pres, no2, temp, uv, co2, ozone, alt);
         closeConnection();
+
+        puts("");
 
 
         sleep(5);
