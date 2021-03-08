@@ -30,7 +30,7 @@ struct HAB_payload_t {
 struct HAB_payload_t *HAB_payload_create(uint8_t payload_type, uint8_t *payload);
 bool HAB_payload_unpack(uint8_t *payload, struct HAB_payload_t *data);
 uint8_t HAB_payload_pack(uint8_t *payload, struct HAB_payload_t *data);
-
+void free_HAB_data(struct HAB_payload_t *payload);
 
 uint8_t calculate_checksum(uint8_t *payload, int size);
 bool confirm_checksum(uint8_t *payload, int size);
