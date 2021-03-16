@@ -54,6 +54,7 @@ V10 Mike Grusin, SparkFun Electronics 10/24/2013
 
 #define COLLECT_NUMBER   20              // collect number, the collection range is 1-100
 #define Ozone_IICAddress ADDRESS_3
+#define UV_SENSOR_PIN A0
 /*   iic slave Address, The default is ADDRESS_3
        ADDRESS_0               0x70      // iic device address
        ADDRESS_1               0x71
@@ -64,7 +65,7 @@ DFRobot_OzoneSensor Ozone;
 
 double baseline;
 double T, P, p0, a;
-int const UV_SENSOR_PIN = A3;
+//int const UV_SENSOR_PIN = A0;
 int const NO2_SENSOR_PIN = A1;
 int const CO2_SENSOR_PIN = A2;
 
@@ -78,12 +79,12 @@ char pressure_on = 1;
 
 SFE_BMP180 pressure;
 
-#define ALTITUDE 1655.0 // Altitude of SparkFun's HQ in Boulder, CO. in meters
-#define ZERO_POINT_VOLTAGE_CO2 (0.252) //define the output of the sensor in volts when the concentration of CO2 is 400PPM (Vmeasure/8.5)
-#define REACTION_VOLTGAE_CO2 (0.025) //define the voltage drop of the sensor when move the sensor from air into 1000ppm CO2
+#define ALTITUDE 36.0 // Altitude of SparkFun's HQ in Boulder, CO. in meters
+#define ZERO_POINT_VOLTAGE_CO2 (0.274) //define the output of the sensor in volts when the concentration of CO2 is 400PPM (Vmeasure/8.5)
+#define REACTION_VOLTGAE_CO2 (0.020) //define the voltage drop of the sensor when move the sensor from air into 1000ppm CO2
 #define ADC_OFFSET 0
 
-float           CO2Curve[3]  =  {2.602,ZERO_POINT_VOLTAGE_CO2,(REACTION_VOLTGAE_CO2/(2.602-3))};
+float CO2Curve[3]  =  {2.602,ZERO_POINT_VOLTAGE_CO2,(REACTION_VOLTGAE_CO2/(2.602-3))};
 
 double getPressure();
 
@@ -119,9 +120,10 @@ void setup()
   baseline = getPressure();
 
   while(!Ozone.begin(Ozone_IICAddress)) {
-    Serial.println("I2c device number error !");
+    //Serial.println("I2c device number error !");
     delay(1000);
-  }  Serial.println("I2c connect success !");
+  }  
+  //Serial.println("I2c connect success !");
 /*   Set iic mode, active mode or passive mode
        MEASURE_MODE_AUTOMATIC            // active  mode
        MEASURE_MODE_PASSIVE              // passive mode
@@ -232,6 +234,7 @@ void loop()
   int32_t pressure_payload = 0;
   int32_t altitude_payload = 0;
   int32_t CO2_payload = 0;
+  int32_t O3_payload = 0;
 
   // Loop here getting pressure readings every 10 seconds.
 
@@ -239,12 +242,12 @@ void loop()
   // you will need to know the altitude at which your measurements are taken.
   // We're using a constant called ALTITUDE in this sketch:
   
-  Serial.println();
-  Serial.print("provided altitude: ");
-  Serial.print(ALTITUDE,0);
-  Serial.print(" meters, ");
-  Serial.print(ALTITUDE*3.28084,0);
-  Serial.println(" feet");
+  // Serial.println();
+  // Serial.print("provided altitude: ");
+  // Serial.print(ALTITUDE,0);
+  // Serial.print(" meters, ");
+  // Serial.print(ALTITUDE*3.28084,0);
+  // Serial.println(" feet");
   
   // If you want to measure altitude, and not pressure, you will instead need
   // to provide a known baseline pressure. This is shown at the end of the sketch.
@@ -271,11 +274,11 @@ void loop()
     if (status != 0)
     {
       //Print out the measurement:
-      Serial.print("temperature: ");
-      Serial.print(T,2);
-      Serial.print(" deg C, ");
-      Serial.print((9.0/5.0)*T+32.0,2);
-      Serial.println(" deg F");
+      // Serial.print("temperature: ");
+      // Serial.print(T,2);
+      // Serial.print(" deg C, ");
+      // Serial.print((9.0/5.0)*T+32.0,2);
+      // Serial.println(" deg F");
       temperature_payload = T*1000;
       
       // Start a pressure measurement:
@@ -299,11 +302,11 @@ void loop()
         if (status != 0)
         {
           //Print out the measurement:
-          Serial.print("absolute pressure: ");
-          Serial.print(P,2);
-          Serial.print(" mb, ");
-          Serial.print(P*0.0295333727,2);
-          Serial.println(" inHg");
+          // Serial.print("absolute pressure: ");
+          // Serial.print(P,2);
+          // Serial.print(" mb, ");
+          // Serial.print(P*0.0295333727,2);
+          // Serial.println(" inHg");
           pressure_payload = (P*0.0295333727*1000);
 
           // The pressure sensor returns abolute pressure, which varies with altitude.
@@ -313,11 +316,11 @@ void loop()
           // Result: p0 = sea-level compensated pressure in mb
 
           p0 = pressure.sealevel(P,ALTITUDE); // we're at 1655 meters (Boulder, CO)
-          Serial.print("relative (sea-level) pressure: ");
-          Serial.print(p0,2);
-          Serial.print(" mb, ");
-          Serial.print(p0*0.0295333727,2);
-          Serial.println(" inHg");
+          // Serial.print("relative (sea-level) pressure: ");
+          // Serial.print(p0,2);
+          // Serial.print(" mb, ");
+          // Serial.print(p0*0.0295333727,2);
+          // Serial.println(" inHg");
 
           // On the other hand, if you want to determine your altitude from the pressure reading,
           // use the altitude function along with a baseline pressure (sea-level or other).
@@ -325,12 +328,12 @@ void loop()
           // Result: a = altitude in m.
 
           a = pressure.altitude(P,baseline);
-          Serial.print("computed altitude: ");
-          Serial.print(a,0);
-          Serial.print(" meters, ");
-          Serial.print(a*3.28084,0);
-          Serial.println(" feet");
-          altitude_payload = (a*3.28084*1000);
+          // Serial.print("computed altitude: ");
+          // Serial.print(a,0);
+          // Serial.print(" meters, ");
+          // Serial.print(a*3.28084,0);
+          // Serial.println(" feet");
+          altitude_payload = (int32_t)(a*3.28084*1000);
         }
         else pressure_on = 2; ////Serial.println("error retrieving pressure measurement\n");
       }
@@ -344,45 +347,46 @@ void loop()
        COLLECT_NUMBER                    // The collection range is 1-100
 */
   int16_t ozoneConcentration = Ozone.ReadOzoneData(COLLECT_NUMBER);
-  Serial.print("Ozone concentration is ");
-  Serial.print(ozoneConcentration);
-  Serial.println(" PPB.");
+  O3_payload = ((int32_t)(Ozone.ReadOzoneData(COLLECT_NUMBER)) * 1000);
+  // Serial.print("Ozone concentration is ");
+  // Serial.print(ozoneConcentration);
+  // Serial.println(" PPB.");
 
-  int UVReading = analogRead(UV_SENSOR_PIN) - ADC_OFFSET; // Get raw sensor reading for UV Sensor
-  float UVVolts = UVReading * 4.6 / 1024.0; //Expected voltage output is between 0V and 1V
+  int UVReading = analogRead(UV_SENSOR_PIN); // Get raw sensor reading for UV Sensor
+  float UVVolts = UVReading * 5 / 1024.0; //Expected voltage output is between 0V and 1V
   float UV_index = convertUV (UVReading); //Sensor reads a UV index value between 1 and 10
-  Serial.print ("Raw ADC data: ");
-  Serial.print (UVReading);
-  Serial.print ("  UV Index: ");
-  Serial.println (UV_index);
+  //  Serial.print ("Raw ADC data: ");
+  //  Serial.print (UVReading);
+  //  Serial.print ("  UV Index: ");
+  //  Serial.println (UV_index);
   int32_t UV_payload = (int32_t)(UV_index * 1000); //Set the value to transmit to Raspberry Pi, increase by a factor of 1000 to maintain resolution
 
   
   int NO2Reading = analogRead(NO2_SENSOR_PIN) + 1; // Get raw sensor reading for UV Sensor
   float NO2Resistance = NO2SeriesResistor * ((1203.0 / (NO2Reading - ADC_OFFSET)) -1); //Convert reading into resistance value
-  float NO2_index = NO2Resistance / 100;; //Convert into index
-  int32_t NO2_payload = ((NO2_index / 0.0409) / 46.0055)*1000; //Set value to transmit to Raspberry Pi, increase by a factor of a 1000
-  Serial.print ("Raw ADC data: ");
-  Serial.print (NO2Reading);
-  Serial.print ("  NO2 Index: ");
-  Serial.print (NO2_payload/1000);
-  Serial.println (" ppb");
+  float NO2_index = NO2Resistance / 100; //Convert into index
+  int32_t NO2_payload = ((int32_t)((NO2_index / 0.0409) / 46.0055))*1000; //Set value to transmit to Raspberry Pi, increase by a factor of a 1000
+  // Serial.print ("Raw ADC data: ");
+  // Serial.print (NO2Reading);
+  // Serial.print ("  NO2 Index: ");
+  // Serial.print (NO2_payload/1000);
+  // Serial.println (" ppb");
 
 
   int CO2Reading = analogRead(CO2_SENSOR_PIN); // Get raw sensor reading for CO2 Sensor
-  float CO2Volts = (CO2Reading - ADC_OFFSET) * 4.6 / 1024.0;
+  float CO2Volts = (CO2Reading) * 5 / 1024.0;
   float CO2_index = CO2GetPercentage(CO2Volts, CO2Curve);
-  Serial.print ("Raw ADC data: ");
-  Serial.print (CO2Reading);
-  Serial.print ("  CO2 Index : ");
+  // Serial.print ("Raw ADC data: ");
+  // Serial.print (CO2Reading);
+  // Serial.print ("  CO2 Index : ");
   if (CO2_index == -1) {
-    CO2_payload = 400; //Set reading to 400 (lowest reading for the sensor)
-    Serial.println ("< 400 ppm"); 
+    CO2_payload = 400000; //Set reading to 400 (lowest reading for the sensor)
+    // Serial.println ("< 400 ppm"); 
     }
   else {
-    CO2_payload = (int32_t)(CO2_index * 1000); // Set value to transmit to Respberry Pi
-    Serial.print(CO2_payload/ 1000); 
-    Serial.println(" ppm");
+    CO2_payload = (CO2_index * 1000); // Set value to transmit to Respberry Pi
+    // Serial.print(CO2_index); 
+    // Serial.println(" ppm");
   }  
 
 //Values for Pi: temperature_payload, pressure_payload, altitute_payload, UV_Payload, NO2_payload, CO2_payload, O3_payload
@@ -391,16 +395,19 @@ void loop()
   
     uint8_t SENSOR_DATA_PAYLOAD[28];
     uint8_t SENSOR_DATA_TX[30];
-    struct sensor_data_t *test = create_sensor_payload(pressure_payload,NO2_payload,temperature_payload, UV_payload, CO2_payload,0, altitude_payload);
+    struct sensor_data_t *test = create_sensor_payload(pressure_payload,NO2_payload,temperature_payload, UV_payload, CO2_payload, O3_payload, altitude_payload);
     //struct sensor_data_t *test = create_sensor_payload(32,32,3,2,4,2,2);
     sensor_payload_pack(SENSOR_DATA_PAYLOAD, test);
     struct HAB_payload_t *test2 = HAB_payload_create(SENSOR_PAYLOAD, SENSOR_DATA_PAYLOAD);
     HAB_payload_pack(SENSOR_DATA_TX, test2);
-    // Serial.write(SENSOR_DATA_TX, 30);
+    Serial.write(SENSOR_DATA_TX, 30);
     free_HAB_data(test2);
     free_sensor_payload(test);
+    while(Serial.available()){
+      Serial.read();
+    }
     // Serial.write(30);
-    systemDelay(2000);
+    systemDelay(5000);
   
 }
 
