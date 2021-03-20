@@ -1,4 +1,4 @@
-all: gcs.exe 
+all: gcs 
 build_dir = .build
 
 CC = gcc
@@ -16,7 +16,7 @@ SOURCES = \
 
 OBJECTS = $(addprefix $(build_dir)/,$(SOURCES:.c=.o)) 
 
-TARGET = gcs.exe
+TARGET = gcs
 
 $(TARGET) : $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) $(INC_FLAGS) -o $@

@@ -1,4 +1,4 @@
-#include "../header/data_packet.h"
+#include "data_packet.h"
 
 struct HAB_payload_t *HAB_payload_create(uint8_t payload_type, uint8_t *payload) {
     struct HAB_payload_t *data = malloc(sizeof(struct HAB_payload_t));

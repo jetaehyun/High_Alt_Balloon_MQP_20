@@ -11,13 +11,11 @@
 #include <fcntl.h>
 #include <signal.h>
 
-#include "header/data_packet.h"
-#include "header/release_payload.h"
-#include "header/sensor_payload.h"
+#include "Data_Packet/data_packet.h"
+#include "Data_Packet/release_payload.h"
+#include "Data_Packet/sensor_payload.h"
 #include "header/postData.h"
 #include "Database/database.h"
-
-
 
 #define PORT 8808
 #define SIZE 30
@@ -80,7 +78,7 @@ int main(int argc, const char* argv[]) {
         float temp = (float)sensorData.temp_sensor/1000;
         float uv = (float)sensorData.UV_sensor/1000;
 
-        printf("buffer: Alt: %.2fft, CO2: %.2fppm, NO2: %.2fppb, Ozone:  %.2fppb, Pressure:  %.2finHg, Temp: %.2fCelsius, UV:  %.0f\n"
+        printf("buffer: Alt: %.2f ft, CO2: %.2f ppm, NO2: %.2f ppb, Ozone:  %.2f ppb, Pressure:  %.2f inHg, Temp: %.2f Cels, UV:  %.0f\n"
 				  ,alt, co2, no2, ozone, pres, temp, uv);
 
         insertDatabase(pres, no2, temp, uv, co2, ozone, alt);

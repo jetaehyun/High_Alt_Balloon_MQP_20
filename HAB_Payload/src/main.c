@@ -36,27 +36,24 @@ void sigint_handler(int signum) {
 }
 
 int main(int argc, const char *argv[]) {
-	signal(SIGINT, sigint_handler);
+	  signal(SIGINT, sigint_handler);
 	
+    // find correct serial port
     int fd = serialOpen("/dev/ttyACM0", 9600);
     //int fd = serialOpen("/dev/ttyUSB0", 9600);
-
     // int fd = serialOpen("/dev/ttyS0", 9600);
     
-	
-    startDB();
     if(fd < 0) {
         fprintf(stderr, "Unable to open serial device: %s\n", strerror(errno));
         return 0;
     }
 
+    startDB();
     uint8_t *incoming_sensor_data = malloc(SIZE);
     struct HAB_payload_t *habData = malloc(sizeof(struct HAB_payload_t));
 
-
-     int sockfd; 
-
-     struct sockaddr_in     servaddr; 
+    int sockfd; 
+    struct sockaddr_in servaddr; 
   
      // Creating socket file descriptor 
      if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
@@ -66,7 +63,7 @@ int main(int argc, const char *argv[]) {
   
      memset(&servaddr, 0, sizeof(servaddr)); 
       
-  //   // Filling server information 
+     // Filling server information 
      servaddr.sin_family = AF_INET; 
      servaddr.sin_port = htons(PORT); 
      servaddr.sin_addr.s_addr = inet_addr("192.168.1.99"); 
@@ -100,12 +97,13 @@ int main(int argc, const char *argv[]) {
 
 
 	      }
-      		while(serialDataAvail(fd)) {
-			serialGetchar(fd);
-		}	
-          serialFlush(fd);
 
-         sleep(2);
+      	while(serialDataAvail(fd)) {
+          serialGetchar(fd);
+		    }	
+        serialFlush(fd);
+
+        sleep(2);
      }  
 
   
