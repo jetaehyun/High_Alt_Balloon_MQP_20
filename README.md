@@ -1,9 +1,9 @@
 # High Altitude Balloon for Measuring Environmental Pollution MQP '20-21
 
-## CURRENTLY BEING DEVELOPED
-
 ## About this project
-This is the repository for the High Altitude Balloon Major Qualifying Project(MQP) at Worcester Polytechnic Institute(WPI). The overarching objective of this MQP is to collect Greenhouse Gas(GHG) (CO2, NO2, etc.) emissions and other data (e.g. temperature, UV, etc.) from the Stratosphere. The repository is broken into three main code bases (Sensor, Ground Control Station(GCS), and Payload) for different tasks. The system works by obtaining the sensor data and packaging them into data packets. From there, the data packets are transferred by USB and Radio. The Sensor obtains and transmits data to the Payload, via USB. Once the data packet has been received, it streams it back down to the the GCS via WiFi bridge. The data packet's integrity is confirmed with a checksum. 
+<img src="https://www.wpi.edu/sites/default/files/inline-image/Offices/Marketing-Communications/WPI_Inst_Prim_FulClr.png" alt="wpi logo" height="400" width="500"/>
+
+This is the repository for the High Altitude Balloon Major Qualifying Project(MQP) at Worcester Polytechnic Institute(WPI). The objective of this MQP was to collect Greenhouse Gas(GHG) (e.g. CO2, NO2, O3) emissions and other data (e.g. temperature, UV, pressure, altitude) from the Stratosphere. The repository is broken into three main code bases (Sensor, Ground Control Station(GCS), and Payload) for different tasks. The system works by obtaining the sensor data and packaging them into data packets. From there, the data packets are transferred by USB and/or radio. The Sensor obtains and transmits data to the Payload, via USB. Once the data packet has been received, it streams it back down to the the GCS via WiFi bridge. The data packet's integrity is confirmed with a checksum. 
 
 # Table of Contents
 - [About this project](#about-this-project)
@@ -13,6 +13,7 @@ This is the repository for the High Altitude Balloon Major Qualifying Project(MQ
 - [Payload (Weather Balloon)](#hab_payload)
   * [How to compile via SSH](#how-to-compile-via-ssh)
 - [Sensors](#hab_nano_sensor)
+- [Data streaming](#data-streaming)
 - [Project Components](#project-components)
 
 ## Devices-Software
@@ -34,24 +35,30 @@ Software for development purposes
      * [Arduino IDE](https://www.arduino.cc/en/software)
 
 ## Libraries
-**SQLite** was used to record all sensor data, on the payload and on the GCS. We decided to create two different databases in case we lost/damaged the payload and because the payload cannot stream data to a cloud service.
+
+**SQLite** was used to record all the sensor data, on the payload and GCS. We decided to create two different databases in case we lost/damaged the payload and because the payload itself cannot stream data to a cloud service.
 * Run `sudo apt-get install sqlite3 libsqlite3-dev`
+* [Export](https://www.sqlitetutorial.net/sqlite-tutorial/sqlite-export-csv/) to CSV
 
 **screen** to run the payload program on a different process after connecting via SSH
 * Run `sudo apt-get install screen`
 
 ## HAB_GCS
 ### Description
+
 To receive the data that is being sent to the ground, a GCS is necessary to capture the incoming sensor data. The GCS can be any computer that runs a Linux based OS. 
+
+When viewing the data, you will most likely run into a database filled with a large number of data points. Using SQL commands will provide easy viewing. For example, you can view the sensor data at, say, 16,000 ft or higher. Our tests generally provided about 2 hours worth of data, which was quite massive, so this will helpful.
 
 ### How to run program
 1. Enter src directory
 2. Make sure you have the required libraries installed
 3. Run `make` 
-4. Run `./gcs.exe`
+4. Run `./gcs`
 
 ## HAB_Payload
 ### Description
+
 The Payload is designed to read the incoming sensor data from the UNO and send it back down to the ground. A Raspberry Pi 4 was used for 4 key reasons: OS, lightweight, cost and SSH.
 
 ### How to compile via SSH
@@ -71,26 +78,39 @@ The Payload is designed to read the incoming sensor data from the UNO and send i
 3. Enter password of username
 4. Navigate to the src directory
 5. Run `make` to build the program
-6. Run `./gcs.exe`
+6. Run `./gcs`
 
 ## HAB_NANO_Sensor
 ### Description
-To collect sensor data, while keeping in mind of the physical dimensions of the payload, an Arduino UNO was selected. The UNO is tasked with reading the sensor data and packing them for transmission to the ***HAB_Payload***. Note. make sure that there are no *Serial.println()* or any other functions that write to the data line except for the one that writes the sensor data. If you do not, you have have garbage data on the receiving end.
+
+To collect sensor data, while keeping in mind of the physical dimensions of the payload, an Arduino UNO was selected. The UNO is tasked with reading the sensor data and packing them for transmission to the ***HAB_Payload***. 
+
+Note. make sure that there are no `Serial.println()` or any other functions that write to the data line except for the ones that write the sensor data. If you do not do this, you will have garbage data on the receiving end.
 
 ### How to upload program
-Open visual studio code and import the directory via **PlatformIO**. The .ini file should automaticaly be recognized and it should allow you to upload new code.
+Open visual studio code and import the directory via **PlatformIO**. The .ini file should automatically be recognized and it should allow you to upload new code.
+
+## Data Streaming
+
+To further add onto the real-time data streaming capabilities of this project, the ThingSpeak API is utilized. Upon receiving data from the Payload, the GCS will send a POST request to their server. This will allow you to view the data in a more sensible manner. Also, this service provides various features that could prove useful to you: live streaming on youtube, import CSV, public access.
+
+To use the ThingSpeak functionality, you will have to create an account on ThingSpeak and create a channel. This channel should possess 7 fields, one for each sensor: Pressure, NO2, Temp, UV, CO2, Ozone, Altitude; read the Doxygen for `sendData()` in `postData.c` to understand what parameters are required. You will also require an API key, which will be provided once you create a channel. There are two keys, **Write API Key** and **Read API Keys**, make sure you the write key.
+
+Refer to [ThingSpeak](https://community.thingspeak.com/documentation%20.../api/) to understand how the API works
 
 ## Project Components
 ### Ground Control Station
 * Any Linux machine
 * Ubiquiti dish
-* Ubiquity antenna
+
+
 ### Payload (Weather Balloon)
 * Raspberry Pi 4
 * 2x GoPro Hero7
-* Webcam (**WIP**)
 * Sensor
 * Ubiquiti antenna
+
+
 ### Sensor
 * Arduino UNO
 * [JBtek BMP180 (Pressure, Altitude, Temperature Sensor)](https://www.amazon.com/JBtek-Barometric-Pressure-Temperature-Altitude/dp/B00UUS12PO)
