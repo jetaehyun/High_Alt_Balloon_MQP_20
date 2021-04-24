@@ -7,7 +7,7 @@ This is the repository for the High Altitude Balloon Major Qualifying Project(MQ
 
 # Table of Contents
 - [About this project](#about-this-project)
-- [Tools and Software](#devices-software)
+- [Devices and Software](#devices-software)
 - [Libraries](#libraries)
 - [Ground Control Station](#hab_gcs)
 - [Payload (Weather Balloon)](#hab_payload)
@@ -80,7 +80,7 @@ The Payload is designed to read the incoming sensor data from the UNO and send i
 5. Run `make` to build the program
 6. Run `./gcs`
 
-## HAB_NANO_Sensor
+## HAB_UNO_Sensor
 ### Description
 
 To collect sensor data, while keeping in mind of the physical dimensions of the payload, an Arduino UNO was selected. The UNO is tasked with reading the sensor data and packing them for transmission to the ***HAB_Payload***. 
